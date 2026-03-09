@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Yokai Camera</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+body{
+margin:0;
+overflow:hidden;
+background:black;
+}
+
+#video{
+position:fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+object-fit:cover;
+z-index:1;
+}
+
+#result{
+position:fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+object-fit:contain;
+background:black;
+display:none;
+z-index:10;
+}
+
+#yokai{
+position:fixed;
+width:150px;
+display:none;
+z-index:20;
+pointer-events:none;
+}
+
+button{
+font-size:18px;
+padding:10px 20px;
+border-radius:10px;
+border:none;
+}
+
+#controls{
+position:fixed;
+bottom:40px;
+left:50%;
+transform:translateX(-50%);
+z-index:30;
+display:flex;
+gap:10px;
+}
+
+#saveBtn{
+display:none;
+background:#4CAF50;
+color:white;
+}
+
+#backBtn{
+display:none;
+background:#2196F3;
+color:white;
+}
+
+</style>
+</head>
+
+<body>
+
+<video id="video" autoplay playsinline></video>
+
+<canvas id="canvas" style="display:none;"></canvas>
+
+<img id="result">
+<img id="yokai">
+
+<div id="controls">
+
+<button onclick="takePhoto()">📸</button>
+
+<button id="saveBtn" onclick="savePhoto()">💾 保存</button>
+
+<button id="backBtn" onclick="backCamera()">戻る</button>
+
+</div>
+
+<script>
+
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const result = document.getElementById("result");
+const yokai = document.getElementById("yokai");
+
+const saveBtn = document.getElementById("saveBtn");
+const backBtn = document.getElementById("backBtn");
+
+let photoData = null;
+
+/* 妖怪画像 */
+
+const yokaiImages = [
+"yokai1.png",
+"yokai2.png",
+"yokai3.png",
+"yokai4.png",
+"yokai5.png",
+"yokai6.png",
+"yokai7.png"
+];
+
+/* カメラ起動 */
+
+navigator.mediaDevices.getUserMedia({
+video:{facingMode:"environment"}
+})
+.then(stream=>{
+video.srcObject=stream;
+});
+
+/* 撮影 */
+
+function takePhoto(){
+
+canvas.width = video.videoWidth;
+canvas.height = video.videoHeight;
+
+const ctx = canvas.getContext("2d");
+
+ctx.drawImage(video,0,0);
+
+photoData = canvas.toDataURL("image/png");
+
+result.src = photoData;
+result.style.display="block";
+
+/* 👻 ランダム妖怪 */
+
+const random = Math.floor(Math.random()*yokaiImages.length);
+
+yokai.src = yokaiImages[random];
+
+yokai.style.left = Math.random()*70 + "vw";
+yokai.style.top = Math.random()*70 + "vh";
+
+yokai.style.display="block";
+
+saveBtn.style.display="inline-block";
+backBtn.style.display="inline-block";
+
+}
+
+/* 保存 */
+
+function savePhoto(){
+
+const a = document.createElement("a");
+
+a.href = photoData;
+
+a.download = "yokai_photo.png";
+
+a.click();
+
+}
+
+/* 戻る */
+
+function backCamera(){
+
+result.style.display="none";
+yokai.style.display="none";
+
+saveBtn.style.display="none";
+backBtn.style.display="none";
+
+}
+
+</script>
+
+</body>
+</html>
